@@ -15,7 +15,12 @@ app.use("/register", (req, res) => {
 // Login
 
 app.use("/login", (req, res) => {
-  res.send("Hi! I am login Page");
+  // res.cookie("name", "rabaya");
+  // res.cookie("age", "30");
+
+  res.clearCookie("name");
+  res.append("id", "130000");
+  res.end();
 });
 
 // Home route
