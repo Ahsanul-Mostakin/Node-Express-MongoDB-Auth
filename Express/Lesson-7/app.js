@@ -8,12 +8,8 @@ app.use("/api/user", userRouter);
 
 // Register Page
 app.use("/register", (req, res) => {
-  // res.status(200).json({
-  //   name: "Ahsanul Mostakin",
-  //   message: "I am register page",
-  //   statusCode: 200,
-  // });
-  res.redirect("/login");
+  res.statusCode = 200;
+  res.sendFile(__dirname + "/views/register.html");
 });
 
 // Login
@@ -24,7 +20,8 @@ app.use("/login", (req, res) => {
 
 // Home route
 app.use("/", (req, res) => {
-  res.send("Hi I am Home Page");
+  res.statusCode = 200;
+  res.sendFile(__dirname + "/views/index.html");
 });
 
 // Fallback route (404)
