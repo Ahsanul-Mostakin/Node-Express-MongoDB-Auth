@@ -1,24 +1,35 @@
 const express = require("express");
+const userRouter = require("./routes/users.route");
+
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("I am a get request at home route");
-  res.end();
+// Mount user router
+app.use("/api/user", userRouter);
+
+// Register Page
+app.use("/register", (req, res) => {
+  // res.status(200).json({
+  //   name: "Ahsanul Mostakin",
+  //   message: "I am register page",
+  //   statusCode: 200,
+  // });
+  res.redirect("/login");
 });
 
-app.post("/", (req, res) => {
-  res.send("I am a post request at home route");
-  res.end();
+// Login
+
+app.use("/login", (req, res) => {
+  res.send("Hi! I am login Page");
 });
 
-app.put("/", (req, res) => {
-  res.send("I am a put request at home route");
-  res.end();
+// Home route
+app.use("/", (req, res) => {
+  res.send("Hi I am Home Page");
 });
 
-app.delete("/", (req, res) => {
-  res.send("I am a delete request at home route");
-  res.end();
+// Fallback route (404)
+app.use((req, res) => {
+  res.status(404).send("<h1>404 !!! Not a valid url</h1>");
 });
 
 module.exports = app;
