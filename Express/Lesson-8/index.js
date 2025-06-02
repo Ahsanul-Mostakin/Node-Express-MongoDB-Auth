@@ -1,16 +1,17 @@
 const express = require("express");
 const app = express();
 const PORT = 3001;
+const bodyParser = require("body-parser");
 
-app.get("/", (req, res) => {
-  //   const id = req.query.id;
-  //   const name = req.query.name;
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-  const { id, name } = req.query;
-  res.send(`<h1>Student id is : ${id}, Student name is : ${name}</h1>`);
-  res.send(`<h1>Student name is : ${name}</h1>`);
+app.post("/user", (req, res) => {
+  const name = req.body.name;
+  const age = req.body.age;
+  res.send(`Welcome ${name}. ${name} is ${age} years old. `);
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost: ${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT}`);
 });
