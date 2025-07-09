@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { title } = require("process"); // (optional) can be removed but leaving it per your request
+// The 'title' import from 'process' is unnecessary and can be removed.
+// const { title } = require("process");
 const app = express();
 
 const port = 3002;
@@ -117,7 +118,7 @@ app.get("/products/:id", async (req, res) => {
     } else {
       res.status(404).send({
         success: false,
-        message: "product was not deleted was this id",
+        message: "product not found with this id", // Changed message for clarity
       });
     }
   } catch (error) {
@@ -130,18 +131,59 @@ app.get("/products/:id", async (req, res) => {
 app.delete("/products/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const product = await Product.findByIdAndDelete({ _id: id });
+    // findByIdAndDelete returns the deleted document, not a result object with deletedCount.
+    // We check if the document was found and deleted by checking if 'product' is not null.
+    const product = await Product.findByIdAndDelete(id);
 
-    if (product.deletedCount > 0) {
+    if (product) {
+      // If product is not null, it means a document was found and deleted.
       res.status(200).send({
         success: true,
-        message: "deletd single product",
-        data: product,
+        message: "deleted single product successfully",
+        data: product, // You might want to return the deleted product or just a success message.
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "product was not deleted was this id",
+        message: "product not found with this id", // Changed message for clarity
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
+      message: error.message,
+    });
+  }
+});
+
+app.put("/products/:id", async (req, res) => {
+  try {
+    const id = req.params.id; // Correctly get the ID from req.params
+    const updatedProduct = await Product.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          // Use req.body for update values, not req.params
+          title: req.body.title,
+          price: req.body.price,
+          description: req.body.description,
+          rating: req.body.rating,
+        },
+      },
+      { new: true } // Returns the modified document rather than the original.
+    );
+
+    // findByIdAndUpdate returns the updated document or null if not found.
+    // Check if updatedProduct is not null to determine if an update occurred.
+    if (updatedProduct) {
+      res.status(200).send({
+        success: true,
+        message: "Product updated successfully",
+        data: updatedProduct,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: "Product not found with this id", // Changed message for clarity
       });
     }
   } catch (error) {
