@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { title } = require("process");
+const { title } = require("process"); // (optional) can be removed but leaving it per your request
 const app = express();
 
 const port = 3002;
@@ -32,15 +32,6 @@ const productSchema = new mongoose.Schema({
 // create Product model
 const Product = mongoose.model("Products", productSchema);
 
-// mongoose
-//   .connect("mongodb://127.0.0.1:27017/testProductDB")
-//   .then(() => console.log("db is connected"))
-//   .catch((error) => {
-//     console.log("db is not connected");
-//     console.log(error);
-//     process.exit(1);
-//   });
-
 const connectDB = async () => {
   try {
     await mongoose.connect("mongodb://127.0.0.1:27017/testProductDB");
@@ -59,25 +50,11 @@ app.get("/", (req, res) => {
 app.post("/products", async (req, res) => {
   try {
     // get data from request body
-
     const newProduct = new Product({
       title: req.body.title,
       price: req.body.price,
       description: req.body.description,
     });
-
-    // const productData = await Product.insertMany([
-    //   {
-    //     title: "iphone 5",
-    //     price: 250,
-    //     description: "beautiful phone",
-    //   },
-    //   {
-    //     title: "iphone 6",
-    //     price: 25,
-    //     description: "beautiful phone",
-    //   },
-    // ]);
 
     const productData = await newProduct.save();
     res.status(201).send({ productData });
@@ -90,18 +67,26 @@ app.post("/products", async (req, res) => {
 
 app.get("/products", async (req, res) => {
   try {
-    const products = await Product.find();
-    if (products) {
+    const price = req.query.price;
+    let products; // ✅ declared once
+
+    if (price) {
+      products = await Product.find({ price: { $gt: price } });
+    } else {
+      products = await Product.find();
+    }
+
+    if (products.length > 0) {
       res.status(200).send({
         success: true,
         message: "return all products",
         data: products,
       });
     } else {
-      success: false,
-        res.status(404).send({
-          message: "products not found",
-        });
+      res.status(404).send({
+        success: false,
+        message: "products not found",
+      });
     }
   } catch (error) {
     res.status(500).send({
@@ -122,10 +107,10 @@ app.get("/products/:id", async (req, res) => {
         data: product,
       });
     } else {
-      success: false,
-        res.status(404).send({
-          message: "product not found",
-        });
+      res.status(404).send({
+        success: false,
+        message: "product not found",
+      });
     }
   } catch (error) {
     res.status(500).send({
@@ -133,15 +118,6 @@ app.get("/products/:id", async (req, res) => {
     });
   }
 });
-
-// const loadRegister = async (req, res) => {
-//   try {
-//   } catch (error) {
-//     res.status(500).send({
-//       message: error.message,
-//     });
-//   }
-// };
 
 app.listen(port, async () => {
   console.log(`Server is running at http://localhost:${port}`);
