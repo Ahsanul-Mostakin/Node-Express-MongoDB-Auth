@@ -79,9 +79,9 @@ app.get("/products", async (req, res) => {
     if (price && rating) {
       products = await Product.find({
         $or: [{ price: { $gt: price } }, { rating: { $gt: rating } }],
-      });
+      }).sort({ price: -1 });
     } else {
-      products = await Product.find();
+      products = await Product.find().sort({ price: 1 });
     }
 
     if (products.length > 0) {
