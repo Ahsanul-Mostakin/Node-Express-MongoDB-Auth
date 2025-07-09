@@ -1,7 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-// The 'title' import from 'process' is unnecessary and can be removed.
-// const { title } = require("process");
 const app = express();
 
 const port = 3002;
@@ -9,11 +7,10 @@ const port = 3002;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// create product schema
 const productSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: [true, "product titlle is required"],
+    required: [true, "product title is required"],
     minlength: [3, "minimum length of the product title should be 3"],
     maxlength: [100, "maxlength length of the product title should be 100"],
     trim: true,
@@ -34,13 +31,24 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
+  phone: {
+    type: String,
+    required: [true, "Phone number is required"],
+    validate: {
+      validator: function (v) {
+        return /\d{3}-\d{3}-\d{4}/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid phone number`,
+    },
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-// create Product model
 const Product = mongoose.model("Products", productSchema);
 
 const connectDB = async () => {
@@ -60,12 +68,12 @@ app.get("/", (req, res) => {
 
 app.post("/products", async (req, res) => {
   try {
-    // get data from request body
     const newProduct = new Product({
       title: req.body.title,
       price: req.body.price,
       rating: req.body.rating,
       description: req.body.description,
+      phone: req.body.phone,
     });
 
     const productData = await newProduct.save();
@@ -124,7 +132,7 @@ app.get("/products/:id", async (req, res) => {
     } else {
       res.status(404).send({
         success: false,
-        message: "product not found with this id", // Changed message for clarity
+        message: "product not found with this id",
       });
     }
   } catch (error) {
@@ -137,21 +145,18 @@ app.get("/products/:id", async (req, res) => {
 app.delete("/products/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    // findByIdAndDelete returns the deleted document, not a result object with deletedCount.
-    // We check if the document was found and deleted by checking if 'product' is not null.
     const product = await Product.findByIdAndDelete(id);
 
     if (product) {
-      // If product is not null, it means a document was found and deleted.
       res.status(200).send({
         success: true,
         message: "deleted single product successfully",
-        data: product, // You might want to return the deleted product or just a success message.
+        data: product,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "product not found with this id", // Changed message for clarity
+        message: "product not found with this id",
       });
     }
   } catch (error) {
@@ -163,23 +168,21 @@ app.delete("/products/:id", async (req, res) => {
 
 app.put("/products/:id", async (req, res) => {
   try {
-    const id = req.params.id; // Correctly get the ID from req.params
+    const id = req.params.id;
     const updatedProduct = await Product.findByIdAndUpdate(
       { _id: id },
       {
         $set: {
-          // Use req.body for update values, not req.params
           title: req.body.title,
           price: req.body.price,
           description: req.body.description,
           rating: req.body.rating,
+          phone: req.body.phone,
         },
       },
-      { new: true } // Returns the modified document rather than the original.
+      { new: true }
     );
 
-    // findByIdAndUpdate returns the updated document or null if not found.
-    // Check if updatedProduct is not null to determine if an update occurred.
     if (updatedProduct) {
       res.status(200).send({
         success: true,
@@ -189,7 +192,7 @@ app.put("/products/:id", async (req, res) => {
     } else {
       res.status(404).send({
         success: false,
-        message: "Product not found with this id", // Changed message for clarity
+        message: "Product not found with this id",
       });
     }
   } catch (error) {
