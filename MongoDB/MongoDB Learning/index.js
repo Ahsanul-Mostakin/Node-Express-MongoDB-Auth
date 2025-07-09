@@ -117,7 +117,31 @@ app.get("/products/:id", async (req, res) => {
     } else {
       res.status(404).send({
         success: false,
-        message: "product not found",
+        message: "product was not deleted was this id",
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
+      message: error.message,
+    });
+  }
+});
+
+app.delete("/products/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const product = await Product.findByIdAndDelete({ _id: id });
+
+    if (product.deletedCount > 0) {
+      res.status(200).send({
+        success: true,
+        message: "deletd single product",
+        data: product,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: "product was not deleted was this id",
       });
     }
   } catch (error) {
