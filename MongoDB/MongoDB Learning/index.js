@@ -19,6 +19,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  rating: {
+    type: Number,
+    required: true,
+  },
   description: {
     type: String,
     required: true,
@@ -53,6 +57,7 @@ app.post("/products", async (req, res) => {
     const newProduct = new Product({
       title: req.body.title,
       price: req.body.price,
+      rating: req.body.rating,
       description: req.body.description,
     });
 
@@ -68,10 +73,13 @@ app.post("/products", async (req, res) => {
 app.get("/products", async (req, res) => {
   try {
     const price = req.query.price;
-    let products; // ✅ declared once
+    const rating = req.query.rating;
+    let products;
 
-    if (price) {
-      products = await Product.find({ price: { $gt: price } });
+    if (price && rating) {
+      products = await Product.find({
+        $or: [{ price: { $gt: price } }, { rating: { $gt: rating } }],
+      });
     } else {
       products = await Product.find();
     }
