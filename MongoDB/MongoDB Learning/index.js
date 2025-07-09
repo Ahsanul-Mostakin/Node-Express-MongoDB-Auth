@@ -13,17 +13,23 @@ app.use(express.urlencoded({ extended: true }));
 const productSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true,
+    required: [true, "product titlle is required"],
+    minlength: [3, "minimum length of the product title should be 3"],
+    maxlength: [100, "maxlength length of the product title should be 100"],
+    trim: true,
   },
 
   price: {
     type: Number,
+    min: [10, "minlength length of the product price should be 10"],
+    max: [100, "maxlength length of the product price should be 100"],
     required: true,
   },
   rating: {
     type: Number,
     required: true,
   },
+
   description: {
     type: String,
     required: true,
