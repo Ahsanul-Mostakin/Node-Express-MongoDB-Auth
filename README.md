@@ -1,6 +1,6 @@
 # node-express-mongodb-auth
 
-A full-stack authentication system built with Node.js, Express, MongoDB, and JWT/Passport.js, following Anisul Islam's Bangla tutorial series.
+Learning a full-stack authentication system using Node.js, Express, MongoDB, and JWT/Passport.js.
 
 ## Features
 - User Registration & Login (Email/Password)
